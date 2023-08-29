@@ -1,5 +1,6 @@
 // EXCEL FILE HEADERS
 /**
+ * SPEAKERS
  * id
  * featured
  * bio
@@ -13,6 +14,16 @@
  * order
  * title
  * sessions
+ * 
+ * SESSIONS
+ * id
+ * complexity
+ * description
+ * speakers
+ * tags
+ * title
+ * 
+ * SCHEDULE
  */
 
 
@@ -148,10 +159,33 @@ function getRowsData_(sheet, options) {
     });
     return objectsById;
   } else {
-   return {
-    speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
-   }
+    const nameContains = function (s) { 
+      return sheet.getName().toLowerCase().contains(s);
+    }
+
+    switch (true) {
+      case nameContains('speaker'):
+        return {
+          speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
+        }
+      case nameContains('sessions'):
+        return {
+          sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
+        }
+    }
   }
+}
+
+function normalizeSessionData_ (sessionData) {
+    // format id
+    sessionData.id = normalizeHeader_(sessionData.id);
+
+    // append speaker id for relationship
+    sessionData.speakers = [ normalizeHeader_(sessionData.speakers) ];
+
+    // turn string tags into obj
+    sessionData.tags = JSON.parse(sessionData.tags);
+
 }
 
 function normalizeSpeakerData_ (speakerData) {
