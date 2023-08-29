@@ -172,6 +172,9 @@ function getRowsData_(sheet, options) {
         return {
           sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
         }
+
+      default:
+        return "Please update title to include speakers, sessions, or schedule key words."
     }
   }
 }
