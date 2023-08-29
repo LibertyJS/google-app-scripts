@@ -160,7 +160,7 @@ function getRowsData_(sheet, options) {
     return objectsById;
   } else {
     const nameContains = function (s) { 
-      return sheet.getName().toLowerCase().contains(s);
+      return String(sheet.getName()).toLowerCase() === (s + 'forjsonexport');
     }
 
     switch (true) {
@@ -168,11 +168,15 @@ function getRowsData_(sheet, options) {
         return {
           speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
         }
-      case nameContains('sessions'):
+      case nameContains('session'):
         return {
           sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
         }
     }
+
+    // return {
+    //   speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
+    // }
   }
 }
 
@@ -184,8 +188,11 @@ function normalizeSessionData_ (sessionData) {
     sessionData.speakers = [ normalizeHeader_(sessionData.speakers) ];
 
     // turn string tags into obj
-    sessionData.tags = JSON.parse(sessionData.tags);
+    if (sessionData.tags && sessionData.tags !== '#N/A') {
+      sessionData.tags = JSON.parse(sessionData.tags);
+    }
 
+    return sessionData;
 }
 
 function normalizeSpeakerData_ (speakerData) {
