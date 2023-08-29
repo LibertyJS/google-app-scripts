@@ -164,19 +164,15 @@ function getRowsData_(sheet, options) {
     }
 
     switch (true) {
-      case nameContains('speaker'):
+      case nameContains('speakers'):
         return {
           speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
         }
-      case nameContains('session'):
+      case nameContains('sessions'):
         return {
           sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
         }
     }
-
-    // return {
-    //   speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
-    // }
   }
 }
 
