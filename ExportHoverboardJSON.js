@@ -1,4 +1,4 @@
-/// EXCEL FILE HEADERS
+// EXCEL FILE HEADERS
 /**
  * SPEAKERS
  * id
@@ -171,22 +171,27 @@ function getRowsData_(sheet, options) {
 
     switch (true) {
       case nameContains('speakers'):
-        return {
-          speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
+        if (objects.length) {
+          return {
+            speakers: objects.map(speakerData => normalizeSpeakerData_(speakerData))
+          }
         }
       case nameContains('sessions'):
-        return {
-          sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
+        if (objects.length) {
+          return {
+            sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
+          }
         }
 
       case nameContains('schedule'): 
-        return {
-          timeslots: objects.map(scheduleData => normalizeScheduleData_(scheduleData))
+        if (objects.length) {
+          return {
+            timeslots: objects.map(scheduleData => normalizeScheduleData_(scheduleData))
+          }
         }
 
       default:
         return "Update sheet title to include speakers, sessions, or schedule key words."
-        // return objects;
     }
   }
 }
@@ -196,10 +201,11 @@ function normalizeScheduleData_ (scheduleData) {
   var startTime = new Date(scheduleData.startTime);
   var endTime = new Date(scheduleData.endTime);
 
-  scheduleData.startTime = startTime.getHours() + ":" + startTime.getMinutes();
-  scheduleData.endTime = endTime.getHours() + ":" + endTime.getMinutes();
+  scheduleData.startTime = startTime.getHours() + ":" + startTime.getMinutes() +  (startTime.getMinutes() === 0 ? '0' : '');
+  scheduleData.endTime = endTime.getHours() + ":" + endTime.getMinutes() + (endTime.getMinutes() === 0 ? '0' : '');
+  
 
-  if (scheduleData.track1 === scheduleData.track2 && scheduleData.track1 ===  scheduleData.track3) {
+  if (scheduleData.track != undefined && scheduleData.track1 === scheduleData.track2 && scheduleData.track1 ===  scheduleData.track3) {
       sessions.push({
         items: [ normalizeHeader_(scheduleData.track1) ], 
         rowSpan: 2
