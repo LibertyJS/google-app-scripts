@@ -1,3 +1,21 @@
+// EXCEL FILE HEADERS
+/**
+ * id
+ * featured
+ * bio
+ * name
+ * company
+ * country
+ * photo
+ * photoUrl
+ * twitter
+ * website
+ * order
+ * title
+ * sessions
+ */
+
+
 // Includes functions for exporting active sheet or all sheets as JSON object (also Python object syntax compatible).
 // Tweak the makePrettyJSON_ function to customize what kind of JSON to export.
 
