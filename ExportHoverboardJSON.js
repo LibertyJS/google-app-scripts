@@ -1,4 +1,4 @@
-// EXCEL FILE HEADERS
+/// EXCEL FILE HEADERS
 /**
  * SPEAKERS
  * id
@@ -24,6 +24,11 @@
  * title
  * 
  * SCHEDULE
+ * startTime
+ * endTime
+ * track1
+ * track2
+ * track3
  */
 
 
@@ -151,7 +156,7 @@ function getRowsData_(sheet, options) {
   var headersRange = sheet.getRange(1, 1, sheet.getFrozenRows(), sheet.getMaxColumns());
   var headers = headersRange.getValues()[0];
   var dataRange = sheet.getRange(sheet.getFrozenRows()+1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
-  var objects = getObjects_(dataRange.getValues(), normalizeHeaders_(headers));
+  var objects = getObjects_(dataRange.getValues(), headers);
   if (options.structure == STRUCTURE_HASH) {
     var objectsById = {};
     objects.forEach(function(object) {
@@ -160,7 +165,8 @@ function getRowsData_(sheet, options) {
     return objectsById;
   } else {
     const nameContains = function (s) { 
-      return String(sheet.getName()).toLowerCase() === (s + 'forjsonexport');
+
+      return String(sheet.getName()).toLowerCase().indexOf(s) > -1;
     }
 
     switch (true) {
@@ -173,10 +179,68 @@ function getRowsData_(sheet, options) {
           sessions: objects.map(sessionData => normalizeSessionData_(sessionData))
         }
 
+      case nameContains('schedule'): 
+        return {
+          timeslots: objects.map(scheduleData => normalizeScheduleData_(scheduleData))
+        }
+
       default:
-        return "Please update title to include speakers, sessions, or schedule key words."
+        return "Update sheet title to include speakers, sessions, or schedule key words."
+        // return objects;
     }
   }
+}
+
+function normalizeScheduleData_ (scheduleData) {
+  var sessions = [];
+  var startTime = new Date(scheduleData.startTime);
+  var endTime = new Date(scheduleData.endTime);
+
+  scheduleData.startTime = startTime.getHours() + ":" + startTime.getMinutes();
+  scheduleData.endTime = endTime.getHours() + ":" + endTime.getMinutes();
+
+  if (scheduleData.track1 === scheduleData.track2 && scheduleData.track1 ===  scheduleData.track3) {
+      sessions.push({
+        items: [ normalizeHeader_(scheduleData.track1) ], 
+        rowSpan: 2
+      });
+      delete scheduleData.track1;
+      delete scheduleData.track2;
+      delete scheduleData.track3;
+  }
+  else {
+      if (scheduleData.track1) {
+      sessions.push({
+        items: [ normalizeHeader_(scheduleData.track1) ], 
+        trackNum: 1,
+        startCol: 1
+      });
+      delete scheduleData.track1;
+  }
+
+  if (scheduleData.track2) {
+      sessions.push({
+        items: [ normalizeHeader_(scheduleData.track2) ], 
+        trackNum: 2,
+        startCol: 2
+      });
+      delete scheduleData.track2;
+  }
+
+    if (scheduleData.track3) {
+      sessions.push({
+        items: [ normalizeHeader_(scheduleData.track3) ],
+        trackNum: 3,
+        startCol: 3
+      });
+      delete scheduleData.track3;
+  }
+  }
+
+  return {
+    ...scheduleData, 
+    sessions
+  };
 }
 
 function normalizeSessionData_ (sessionData) {
